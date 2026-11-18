@@ -1,0 +1,23 @@
+name: almaty-access
+services:
+  proxy:
+    image: ginuerzh/gost:2.11.5
+    container_name: almaty-access-proxy
+    network_mode: host
+    command: ["-L=http://127.0.0.1:48921?secrets=/run/secrets/proxy.auth"]
+    restart: unless-stopped
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - type: bind
+        source: /etc/almaty-access/proxy.auth
+        target: /run/secrets/proxy.auth
+        read_only: true
+        bind:
+          create_host_path: false
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

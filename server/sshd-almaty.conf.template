@@ -1,0 +1,20 @@
+# Ubuntu 24.04 / OpenSSH. Добавить отдельным файлом sshd_config.d.
+# Проверить итог через sshd -t и sshd -T -C user=almaty-tunnel,... до reload.
+Match User almaty-tunnel
+    AuthenticationMethods publickey
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+    KbdInteractiveAuthentication no
+    AllowTcpForwarding local
+    PermitOpen 127.0.0.1:48921
+    PermitListen none
+    AllowStreamLocalForwarding no
+    AllowAgentForwarding no
+    X11Forwarding no
+    PermitTTY no
+    PermitTunnel no
+    PermitUserRC no
+    GatewayPorts no
+    MaxSessions 0
+    ForceCommand /usr/sbin/nologin
+Match all

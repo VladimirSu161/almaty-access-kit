@@ -1,0 +1,17 @@
+# User unit: только транспорт. НЕ граница CLI/браузера.
+[Unit]
+Description=Almaty Access SSH transport (Unix socket only)
+
+[Service]
+Type=simple
+UMask=0077
+ExecStart=/usr/bin/ssh -F "%h/.config/almaty-access/ssh_config" -NT almaty-access
+Restart=always
+RestartSec=10
+TimeoutStopSec=10
+NoNewPrivileges=yes
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=default.target

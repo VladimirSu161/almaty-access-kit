@@ -1,0 +1,24 @@
+#!/bin/sh
+# Альтернатива compose, НЕ запускать оба варианта.
+set -eu
+test -s /etc/almaty-access/proxy.auth || {
+    echo 'Нет непустого /etc/almaty-access/proxy.auth; запуск отменён.' >&2
+    exit 78
+}
+python3 - <<'PY'
+import os, re, stat
+path = '/etc/almaty-access/proxy.auth'
+info = os.lstat(path)
+if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or stat.S_IMODE(info.st_mode) != 0o600:
+    raise SystemExit('proxy.auth: требуются обычный файл, root и права 600; старт отменён.')
+with open(path, 'rb') as stream:
+    if not re.fullmatch(rb'client [0-9a-f]{64}\n', stream.read()):
+        raise SystemExit('proxy.auth: неверный формат; старт отменён.')
+PY
+exec docker run --detach --name almaty-access-proxy \
+    --network host --restart unless-stopped \
+    --read-only --cap-drop ALL --security-opt no-new-privileges:true \
+    --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 \
+    --mount type=bind,src=/etc/almaty-access/proxy.auth,dst=/run/secrets/proxy.auth,readonly \
+    ginuerzh/gost:2.11.5 \
+    '-L=http://127.0.0.1:48921?secrets=/run/secrets/proxy.auth'

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "kit_version": "1.0.0",
+  "os": "example",
+  "stage": "inventory",
+  "checks": [{"id": "inventory", "status": "unknown", "evidence": "Это пример формы, проверки не выполнялись."}],
+  "next_step": "Определить ОС и реальную установку без изменений."
+}

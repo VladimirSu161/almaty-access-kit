@@ -1,0 +1,20 @@
+#!/bin/sh
+# Отдельный Chrome с обязательным HTTP proxy; это не OS-firewall всего браузера.
+set -eu
+case "$#:${1:-}" in
+    0:|1:--check|1:--diagnostic-only) target='https://api.ipify.org' ;;
+    1:--claude) target='https://claude.ai/' ;;
+    *) echo 'Использование: chrome-almaty.command [--check|--claude]' >&2; exit 2 ;;
+esac
+netdir='@CONFIG_DIR@'
+case "$netdir" in *'@'[A-Z_]*'@'*) exit 78;; esac
+umask 077
+mkdir -p "$netdir/chrome"
+exec '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+    --user-data-dir="$netdir/chrome" \
+    --proxy-server='http://127.0.0.1:48921' \
+    --proxy-bypass-list='<-loopback>' \
+    --host-resolver-rules='MAP * ~NOTFOUND, EXCLUDE 127.0.0.1' \
+    --disable-background-networking --disable-sync --disable-extensions \
+    --disable-quic --force-webrtc-ip-handling-policy=disable_non_proxied_udp \
+    --no-first-run --no-default-browser-check "$target"

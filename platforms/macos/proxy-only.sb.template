@@ -1,0 +1,9 @@
+(version 1)
+(allow default)
+;; Ограничение IP-сокетов CLI и наследующих профиль дочерних процессов.
+(deny network-outbound (remote ip))
+(deny network-outbound (literal "/private/var/run/mDNSResponder"))
+(deny mach-lookup (global-name "com.apple.dnssd.service"))
+(allow network-outbound (remote tcp "localhost:48921"))
+;; Не передавать ссылку входа обычному браузеру через open.
+(deny process-exec (literal "/usr/bin/open"))

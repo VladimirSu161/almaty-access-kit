@@ -1,0 +1,30 @@
+{
+  "schema": 2,
+  "kit_version": "1.0.0",
+  "checked_date": "2026-11-06",
+  "delivery": "guided_setup",
+  "recipient_validation_required": true,
+  "completion": [
+    "web_chat",
+    "local_task",
+    "resume_browser",
+    "resume_cli"
+  ],
+  "platforms": {
+    "macos": {
+      "route": "iTerm2 + CLI sandbox + fixed-proxy Google Chrome",
+      "author_evidence": "historical working route",
+      "clean_install_from_this_archive_verified": false,
+      "browser_os_firewall": false
+    },
+    "linux_ubuntu_24_04_x64": {
+      "route": "Ubuntu desktop + bwrap session + Chrome/Wayland",
+      "author_runtime_verified": false
+    },
+    "windows_11_x64_wsl2": {
+      "route": "dedicated Ubuntu WSL2 + same Linux session + WSLg Chrome",
+      "author_runtime_verified": false
+    }
+  },
+  "agent_contract": "Proceed through setup; verify and repair on the recipient computer. Stop a dependent action for a concrete failed check, not for absent author hardware. Never invent a pass or bypass the intended route."
+}

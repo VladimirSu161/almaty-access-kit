@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+umask 077
+netdir='@CONFIG_DIR@'
+cli='@CLI_BINARY@'
+case "$netdir$cli" in *'@'[A-Z_]*'@'*)
+    echo 'Сначала подготовь шаблоны через kit.py.' >&2; exit 78;; esac
+test -x /usr/bin/sandbox-exec && test -x "$cli" || {
+    echo 'Нет sandbox-exec или выбранного CLI. Обычный запуск не выполнен.' >&2
+    exit 78
+}
+test -f "$netdir/proxy-only.sb" && test -f "$netdir/proxy.auth" || {
+    echo 'Не найдены профиль защиты или файл proxy.auth.' >&2; exit 78;
+}
+test ! -L "$netdir/proxy.auth" || exit 78
+test "$(/usr/bin/stat -f '%u' "$netdir/proxy.auth")" = "$(id -u)" || exit 78
+test "$(/usr/bin/stat -f '%Lp' "$netdir/proxy.auth")" = 600 || {
+    echo 'proxy.auth должен принадлежать тебе и иметь права 600.' >&2; exit 78;
+}
+IFS=' ' read -r proxy_user proxy_password extra < "$netdir/proxy.auth"
+test "$proxy_user" = client && test -z "${extra:-}" || exit 78
+case "$proxy_password" in ''|*[!0-9a-f]*) exit 78;; esac
+test "${#proxy_password}" -eq 64 || exit 78
+proxy="http://$proxy_user:$proxy_password@127.0.0.1:48921"
+export http_proxy="$proxy" https_proxy="$proxy" all_proxy="$proxy"
+export HTTP_PROXY="$proxy" HTTPS_PROXY="$proxy" ALL_PROXY="$proxy"
+export no_proxy='' NO_PROXY=''
+unset proxy_password proxy_user extra proxy SSH_AUTH_SOCK
+exec /usr/bin/sandbox-exec -f "$netdir/proxy-only.sb" "$cli" "$@"

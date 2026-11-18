@@ -1,0 +1,14 @@
+# Только отдельный дистрибутив AlmatyAccess, не существующая рабочая Ubuntu.
+[boot]
+systemd=true
+
+[interop]
+enabled=false
+appendWindowsPath=false
+
+[automount]
+enabled=false
+mountFsTab=false
+
+[network]
+generateResolvConf=false
